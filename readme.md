@@ -20,37 +20,52 @@
 
 
 ### 代码修改
-修改WeChatMsg/blob/master/app/ui/tool/pc_decrypt/pc_decrypt.py#L277C10-L277C10
+修改
+https://github.com/uknowsec/WeChatMsg/blob/master/app/ui/tool/pc_decrypt/pc_decrypt.py#L59
 如果本地config.json存在则从本地获取到key等信息
 ```
-    def run(self):
+    def set_info(self, result):
         file_path = "config.json"
         if os.path.isfile(file_path):
             with open(file_path, 'r') as file:
-            config_str = file.read()
+                config_str = file.read()
             config_str = config_str.replace("'", "\"")
-            result = json.loads(config_str)
+            result[0] = json.loads(config_str)
             file.close()
+        print(result)
+        if result[0] == -1:
+            QMessageBox.critical(self, "错误", "请登录微信")
+        elif result[0] == -2:
+            QMessageBox.critical(self, "错误", "微信版本不匹配\n请更新微信版本为:3.9.8.25")
+        elif result[0] == -3:
+            QMessageBox.critical(self, "错误", "WeChat WeChatWin.dll Not Found")
+        elif result[0] == -10086:
+            QMessageBox.critical(self, "错误", "未知错误，请收集错误信息")
         else:
-            file_path = './app/resources/data/version_list.json'
-            if not os.path.exists(file_path):
-                resource_dir = getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__)))
-                file_path = os.path.join(resource_dir, 'app', 'resources', 'data','version_list.json')
-            with open(file_path, "r", encoding="utf-8") as f:
-                VERSION_LIST = json.loads(f.read())
-            try:
-                result = get_wx_info.get_info(VERSION_LIST)
-                if result == -1:
-                    result = [result]
-                elif result == -2:
-                    result = [result]
-                elif result == -3:
-                    result = [result]
-            except:
-                logger.error(traceback.format_exc())
-                result = [-10086]
-        self.signal.emit(result)
-
+            self.ready = True
+            self.info = result[0]
+            self.label_key.setText(self.info['key'])
+            self.lineEdit.setText(self.info['wxid'])
+            self.label_name.setText(self.info['name'])
+            self.label_phone.setText(self.info['mobile'])
+            self.label_pid.setText(str(self.info['pid']))
+            self.label_version.setText(self.info['version'])
+            self.lineEdit.setFocus()
+            self.checkBox.setCheckable(True)
+            self.checkBox.setChecked(True)
+            self.get_wxidSignal.emit(self.info['wxid'])
+            directory = os.path.join(path.wx_path(), self.info['wxid'])
+            if os.path.exists(directory):
+                self.label_db_dir.setText(directory)
+                self.wx_dir = directory
+                self.checkBox_2.setCheckable(True)
+                self.checkBox_2.setChecked(True)
+                self.ready = True
+            if self.ready:
+                self.label_ready.setText('已就绪')
+            if self.wx_dir and os.path.exists(os.path.join(self.wx_dir)):
+                self.label_ready.setText('已就绪')
+        self.stopBusy()
 ```
 
 ### 编译
