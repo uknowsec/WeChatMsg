@@ -68,7 +68,7 @@ https://github.com/uknowsec/WeChatMsg/blob/master/app/ui/tool/pc_decrypt/pc_decr
         self.stopBusy()
 ```
 
-### 编译
+### 编译打包
 
 ```
 conda activate py3.10
