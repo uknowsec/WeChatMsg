@@ -52,3 +52,11 @@
         self.signal.emit(result)
 
 ```
+
+### 编译
+
+```
+conda activate py3.10
+pip install -r requirements.txt
+pyinstaller -F main.py --add-data="app/resources/data/;app/resources/data/"
+```
