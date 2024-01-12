@@ -75,3 +75,8 @@ conda activate py3.10
 pip install -r requirements.txt
 pyinstaller -F main.py --add-data="app/resources/data/;app/resources/data/"
 ```
+
+
+### 使用方法
+创建config.json文件到exe运行目录
+点击获取信息 设置目录解密即可
